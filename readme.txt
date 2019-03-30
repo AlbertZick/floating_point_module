@@ -1,7 +1,7 @@
-File top là FloatingPointCalculator.v
+File top la FloatingPointCalculator.v
 File danh cho tinh cong tru là AddSub.v
 File dung cho tinh nhan la Multiplication.v
-File dung cho tinh chia là Division.v
+File dung cho tinh chia la Division.v
 
 File testbench tong hop la Final_tb.v
 File testbench cho cong tru la AddSub_tb.v
