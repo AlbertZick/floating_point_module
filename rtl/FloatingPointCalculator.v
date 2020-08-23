@@ -1,3 +1,43 @@
+module top (
+	input clk,
+	input rst_n,
+
+	input  [31:0]     inA, inB,
+	input  [1:0] 		op,
+	input 				en,
+
+	output reg [31:0] out,
+	output reg        finish
+);
+
+reg [31:0] inA_r, inB_r;
+reg [1:0]  op_r;
+
+wire [31:0] out_w;
+wire 			finish_w;
+
+
+always @(posedge clk or negedge rst_n) begin
+	if(~rst_n) begin
+		op_r  <= 0;
+		inA_r <= 0;
+		inB_r <= 0;
+		out   <= 0;
+		finish <= 0;
+	end else begin
+		op_r  <= op;
+		inA_r <= inA;
+		inB_r <= inB;
+		out   <= out_w;
+		finish <= finish_w;
+	end
+end
+
+FloatingPointCalculator FP (inA_r,inB_r,op_r,en,rst_n,clk,out_w,finish_w);
+
+endmodule
+
+
 module FloatingPointCalculator(inA,inB,op,en,rst_n,clk,out,finish);
 	input clk,en,rst_n;
 	input [1:0] op; //00 = add; 01 = subtract; 10 = multiply; 11 = divide;
@@ -7,17 +47,20 @@ module FloatingPointCalculator(inA,inB,op,en,rst_n,clk,out,finish);
 	wire [31:0] inAb,inBb,outpre;
 	wire [31:0] AddSub_result, Multiply_result, Divide_result,MulDiv_result;
 
-	buffer_32bit BA(inA,en,inAb);
-	buffer_32bit BB(inB,en,inBb);
+	// buffer_32bit BA(inA,en,inAb);
+	// buffer_32bit BB(inB,en,inBb);
+	assign inAb = inA;
+	assign inBb = inB;
 	
-	AddSub AddSub_m(inAb,inBb,op[0],AddSub_result);
+	AddSub AddSub_m(clk,inAb,inBb,op[0],AddSub_result);
 	Multiplication Multiply_m(inAb,inBb,clk,Multiply_result);
 	Division Divide_m(inAb,inBb,clk,en,rst_n,Divide_result,finish);
 
 	flipflop FF(finish_delay,finish,clk,1'b1);
 	mux21 #32 MMD(Multiply_result,Divide_result,op[0],MulDiv_result);
 	mux21 #32 MF(AddSub_result,MulDiv_result,op[1],outpre);
-	buffer_32bit BF(outpre,finish,out);
+	// buffer_32bit BF(outpre,finish,out);
+	assign out = outpre;
 
 endmodule
 /////////

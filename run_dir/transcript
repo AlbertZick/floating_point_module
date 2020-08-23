@@ -12,13 +12,4 @@
 # //  is prohibited from disclosure under the Trade Secrets Act,
 # //  18 U.S.C. Section 1905.
 # //
-# waveform/wave.wlf opened as dataset "wave"
-add wave -position insertpoint  \
-wave:/Final_tb/FPC/clk \
-wave:/Final_tb/FPC/en \
-wave:/Final_tb/FPC/finish \
-wave:/Final_tb/FPC/inA \
-wave:/Final_tb/FPC/inB \
-wave:/Final_tb/FPC/op \
-wave:/Final_tb/FPC/out \
-wave:/Final_tb/FPC/rst_n
+# wave.wlf opened as dataset "wave"

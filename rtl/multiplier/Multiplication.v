@@ -28,16 +28,48 @@ MulReg MR(a,b,c,d,e,f,g,h,i,j,k,l,m,inA,inB,
 			clk,
 			ad,bd,cd,dd,ed,fd,gd,hd,id,jd,kd,ld,md,inAd,inBd);
 WallaceTree WT(ad,bd,cd,dd,ed,fd,gd,hd,id,jd,kd,ld,md,fracmul);
-MulNorm Mnrm(fracmul,expminus,outround,round);
-MulRound Mrnd(outround,round,expminus,outnormal[22:0],expminus2);
 
-EightBitSub Ef(expsum,expminus2,,exptemp);
+// add ff to reduce timing ----------------------
+reg [31:0] inAd_d1, inAd_d2 ;
+reg [31:0] inBd_d1, inBd_d2 ;
+reg  [7:0] expsum_d1;
+reg  [47:0] fracmul_d1;
+always @(posedge clk) begin
+   fracmul_d1 <= fracmul;
+   expsum_d1  <= expsum;
+
+   inAd_d1   <= inAd;
+   inBd_d1   <= inBd;
+end
+//------------------------------------------------
+
+MulNorm Mnrm(fracmul_d1,expminus,outround,round);
+
+// add ff to reduce timing -----------------------
+reg [7:0]  expminus_d1;
+reg [23:0] outround_d1;
+reg        round_d1;
+reg [7:0]  expsum_d2;
+always @(posedge clk) begin
+   expminus_d1 <= expminus;
+   outround_d1 <= outround;
+   round_d1    <= round;
+   inAd_d2     <= inAd_d1;
+   inBd_d2     <= inBd_d1;
+   expsum_d2   <= expsum_d1;
+end
+//------------------------------------------------
+
+MulRound Mrnd(outround_d1,round_d1,expminus_d1,outnormal[22:0],expminus2);
+
+
+EightBitSub Ef(expsum_d2,expminus2,,exptemp);
 EightBitSub Ex(exptemp,8'b00010111,,outnormal[30:23]);
 
-CheckType CtA(inAd,zeroA,infA,nanA);
-CheckType CtB(inBd,zeroB,infB,nanB);
+CheckType CtA(inAd_d2,zeroA,infA,nanA);
+CheckType CtB(inBd_d2,zeroB,infB,nanB);
 assign outnan=32'b01111111101010101010101010101010;
-xor(signinf,inA[31],inB[31]);
+xor(signinf,inAd_d2[31],inBd_d2[31]);
 assign outnormal[31]=signinf;
 assign outinf={signinf,8'b11111111,23'b0};
 assign outzero={signinf,31'b0};

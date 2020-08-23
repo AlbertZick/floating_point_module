@@ -40,7 +40,12 @@ shift_left_2 		m_slt		(m_slt_out, s_reg_out) ;
 
 //mux z
 mux_2_1_27_bits		ini_iterator_1 (shifted_s, dividend_ext, m_slt_out, ini_iterator_slct) ;
+
+// the 2 following statement are similar
 sub_nadd_27_bits	add			(next_s, shifted_s, m_slct_qd_out, 1'b1) ;
+// assign next_s = shifted_s - m_slct_qd_out ;
+
+
 qi_mem 				m_bsd_q		(bsd_q_2, bsd_q_1, bsd_q_0, mul_n3, mul_n2, mul_n1, mul_0, mul_1, mul_2, mul_3,
 								 	clk, n_rst, qi_mem_en) ;
 bsd_2_bcd			m_bsd_2_bcd	(bcd, bsd_q_2[11:0], bsd_q_1[11:0], bsd_q_0[11:0]) ;
